@@ -29,7 +29,6 @@ def showGuide():
         for item in data['Episodes']:
             item['Released'] = item['Released'][5:7] + "/" + item['Released'][8:] + "/" + item['Released'][2:4]
             date1 = item['Released']
- #           newDate1 = time.strftime(date1, "%m/%d/%y")
             currentDate = time.strftime("%x")
             if currentDate > date1:
                 print ((item['Episode']),(item['Title']),(item['Released']))
