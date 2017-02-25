@@ -1,12 +1,14 @@
 import json
 import urllib.request
 import datetime
-import smtplib
-from email.mime.text import MIMEText ## work on sending e-mail
+#from email.mime.text import MIMEText ## work on sending e-mail
+
+def episodesAired(showName,episodeNum,episodeTitle,releaseDate):
+    showEpisodeList = ["%s : %s %s %s" % (showName, episodeNum, episodeTitle, releaseDate)]
+    return showEpisodeList
 
 def showGuide():
     fid = open("shows.txt","w")
-    showDict = {}
     while True:
         title = input("What is the title of your show? \n(if you are done, type stop)")
         if title == "stop":
@@ -22,30 +24,41 @@ def showGuide():
     fid.close()
     fid = open("shows.txt","r")
     for each in fid:
+        showAired = []
         imdbApi = "http://www.omdbapi.com/?t=%s" % (each)
         jsonObj = urllib.request.urlopen(imdbApi)
         jsonObj = jsonObj.read().decode("utf-8")
         data = json.loads(jsonObj)
         try: ## for seasons
-            for item in data['Episodes']:
-                date1 = item['Released']
-                showDate = datetime.datetime.strptime(date1,"%Y-%m-%d")
+            showName = data["Title"]
+            for episode in data['Episodes']:
+                episodeDate = episode['Released']
+                showDate = datetime.datetime.strptime(episodeDate,"%Y-%m-%d")
                 currentDate = datetime.datetime.now()
+                showEpisodeNum = episode['Episode']
+                episodeTitle = episode['Title']
+                releaseDate = episode['Released']
                 if currentDate > showDate:
-                    print ((item['Episode']),(item['Title']),(item['Released']))
+                    showAired += episodesAired(showName, showEpisodeNum, episodeTitle, releaseDate)
+            return showAired
+                    #print ((episode['Episode']),(episode['Title']),(episode['Released']))
 
         except: ## For individual episodes
-            break
-            for item in data['Episode']:
-                item['Released'] = item['Released'][5:7] + "/" + item['Released'][8:] + "/" + item['Released'][2:4]
-                date1 = item['Released']
-                print(date1)
-     #           newDate1 = time.strftime(date1, "%m/%d/%y")
-                currentDate = time.strftime("%x")
+            print ("Not supposed to be here")
+            showName = data["Title"]
+            for episode in data['Episode']:
+                episodeDate = episode['Released']
+                showDate = datetime.datetime.strptime(episodeDate,"%Y-%m-%d")
+                currentDate = datetime.datetime.now()
+                showEpisodeNum = episode['Episode']
+                episodeTitle = episode['Title']
+                releaseDate = episode['Released']
                 print(currentDate)
-                if currentDate > date1:
-                    print ((item['Episode']),(item['Title']),(item['Released']))
+                showEpisodeNum = episode['Episode']
+                episodeTitle = episode['Title']
+                releaseDate = episode['Released']
+                if currentDate > showDate:
+                    episodesAired(showName, showEpisodeNum, episodeTitle, releaseDate)
 
 showGuide()
 
-#def showDict(title,released):
